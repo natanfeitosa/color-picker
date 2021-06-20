@@ -1,0 +1,9 @@
+@mixin slider-range($cls, $col) {
+    input[type="range"].#{$cls} {
+
+        &::-webkit-slider-runnable-track,
+        &::-webkit-slider-thumb {
+            background: $col;
+        }
+    }
+}
