@@ -5,139 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Color Picker</title>
     <link href="https://fonts.googleapis.com/css2?family=Ranchers&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./dist/style.min.css">
 </head>
 <body>
-
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            background-color: teal;
-            min-height: 100vh;
-            width: 100vw;
-
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        div {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 6px;
-            width: 100%;
-        }
-
-        .card {
-            background-color: aliceblue;
-            border: 1px solid rgba(0, 0, 0, 0.125);
-            border-radius: .25rem;
-            display: inherit;
-            flex-direction: column;
-            margin: 10px auto;
-            padding: 10px;
-            width: min(90%, 560px);
-            max-width: 560px;
-        }
-
-        .header {
-            text-align: center;
-            justify-content: center;
-            flex-basis: 100%;
-            padding-bottom: 20px;
-            margin-bottom: 30px;
-        }
-
-        #title {
-            font-family: 'Ranchers', cursive;
-            font-size: 2.4rem;
-        }
-
-        .card-body {
-            display: inherit;
-            flex-direction: inherit;
-            width: 100%;
-        }
-
-        .box {
-            width: 58px;
-            font-weight: bold;
-            border: 1px solid rgba(0, 0, 0, 0.125);
-            border-radius: .25rem;
-            padding: 6px;
-        }
-
-        input[type="range"] {
-            flex-basis: 60%;
-            -webkit-appearance: slider-horizontal;
-        }
-
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            margin-top: -5px;
-        }
-
-        input[type="range"]::-webkit-slider-runnable-track {
-            background: red;
-            height: 6px;
-            border: none;
-            border-radius: 3px;
-        }
-
-        input[type=range]:focus {
-            outline: none;
-        }
-
-        .pr {
-            background-color: white;
-            border: 1.1px solid rgba(0, 0, 0, 0.13);
-            border-radius: .25rem;
-            height: 20px;
-            width: 300px;
-            display: inherit;
-            justify-content: center;
-            font-weight: 600;
-        }
-
-        @media (max-width: 576px) {
-            .card {
-                padding: 10px 2px;
-                /*width: 90%;*/
-            }
-
-            .pr {
-                width: 80%;
-            }
-        }
-
-        @media (max-width: 425px) {
-            div {
-                padding: 6px 2px;
-            }
-
-            #title {
-                font-size: 2rem;
-            }
-
-            .box {
-                padding: 6px 2px;
-                width: 52px;
-            }
-
-            #r,
-            #g,
-            #b,
-            #a {
-                width: 46px;
-            }
-        }
-    </style>
-
     <div class="card">
         <div class="header">
             <p id="title">Color Picker</p>
@@ -145,18 +15,18 @@
         <div class="card-body">
             <div>
                 <p class="box">Red</p>
-                <input type="range" class="red" value="255" min="0" max="255">
-                <input type="number" class="red box" value="255" min="0" max="255">
+                <input type="range" class="red" value="30" min="0" max="255">
+                <input type="number" class="red box" value="30" min="0" max="255">
             </div>
             <div>
                 <p class="box">Green</p>
-                <input type="range" class="green" value="255" min="0" max="255">
-                <input type="number" class="green box" value="255" min="0" max="255">
+                <input type="range" class="green" value="40" min="0" max="255">
+                <input type="number" class="green box" value="40" min="0" max="255">
             </div>
             <div>
                 <p class="box">Blue</p>
-                <input type="range" class="blue" value="255" min="0" max="255">
-                <input type="number" class="blue box" value="255" min="0" max="255">
+                <input type="range" class="blue" value="50" min="0" max="255">
+                <input type="number" class="blue box" value="50" min="0" max="255">
             </div>
             <div>
                 <p class="box">Alpha</p>
@@ -165,7 +35,7 @@
             </div>
             <br>
             <br>
-            <div class="pr">
+            <div id="pr">
                 <p id="hex">#ffffff</p>
             </div>
         </div>

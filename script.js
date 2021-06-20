@@ -1,19 +1,8 @@
+let debug = true
 
-/*function altera(el) {
-    let r = document.querySelectorAll('input[name=r]')[0].value,
-        g = document.querySelectorAll('input[name=g]')[0].value,
-        b = document.querySelectorAll('input[name=b]')[0].value,
-        a = document.querySelectorAll('input[name=a]')[0].value
-    let v = el.value, n = el.name;
-    let rgba = `rgba(${r}, ${g}, ${b}, ${a})`
-    let hex = rgbaToHex(rgba)
-    console.log(rgba)
-    n == 'a' ? $('#' + n).value = parseFloat(v) : $('#' + n).value = parseInt(v)
-    bg($('.pr'), r, g, b, a)
-    let p = $('#hex')
-    p.innerText = `${hex}`
-    hex == '#000000ff' ? p.style.color = '#fff' : p.style.color = '#000'
-}*/
+if (!String.prototype.trim) {
+    String.prototype.trim = () => this.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
+}
 
 class Observer {
     constructor() {
@@ -38,47 +27,75 @@ class Observer {
 }
 
 class Utils {
-    constructor(){};
+    constructor(){}
 
-    trim(str) {
-        return toString(str).replace(/^\s+|\s+$/gm, '');
-    };
-
-    convert(c) {
+    toHex(c) {
         return parseInt(c, 10).toString(16)
     }
 
-    setBg(e, r, g, b, a) {
+    setBg(e, { r, g, b, a }) {
         let rgba = `rgba(${r}, ${g}, ${b}, ${a || 1})`;
         e.style.background = rgba;
         console.log(rgba);
     }
 }
 
+/**
+ * 
+ * @param { string } str 
+ * @param { boolean } unique 
+ * @returns { Element | NodeListOf.<Element> }
+ */
+const $ = (str, unique=false) => {
+    if(/^\#/.test(str.trim()) || unique) {
+        return document.querySelector(str)
+    }
+
+    return document.querySelectorAll(str)
+}
+
 class Picker extends Observer {
+
+    /**
+     * 
+     * @type {{ _this: Picker, type: String, data: Array }}
+     */
+    static types;
+
     constructor(){
         super();
         // this.observer = new Observer();
         this.utils = new Utils();
-        this.colors = {'r':255,'g':255,'b':255,'a':1};
-        this.hex = '#ffffff'
-        this.$ = document.querySelectorAll.bind(document);
+        this.colors = {'r':30,'g':40,'b':50,'a':1};
+        this.hex = '#ffffff';
+        this.ranges = [];
     }
 
-    addEvent(el) {
+    /**
+     * 
+     * @param { Array.<Array.<String>> } opts
+     * @returns { void }
+     */
+    addEvent(opts) {
         const _this = this
-        el.map(i => {
-            this.$(`.${i['class']}`).forEach(item => {
-                item.addEventListener('input', e => {
-                    let color = i.var === 'a' ? parseFloat(item.value) : parseInt(item.value)
-                    this.colors[i['var']] = color
+        opts.map(i => {
+            
+            $(`.${i[0]}`).forEach(el => {
+                el.addEventListener('input', () => {
+                    const color = i[1] == 'a' ? parseFloat(el.value) : parseInt(el.value)
 
-                    // console.log(`\nEvent: ${color}`)
+                    this.colors[i[1]] = color
+
+                    if (debug) {
+                        console.log(`Array Item: ${i}`)
+                        console.log(`Color num: ${color}`)
+                        console.log(`Color code: ${i[1]}`)
+                    }
 
                     this.notify({
                         'type': 'setValue',
                         _this,
-                        'data': [i['class'], color]
+                        'data': [i[0], color]
                     })
                 })
             })
@@ -87,43 +104,57 @@ class Picker extends Observer {
 
     rgba2hex() {
         let hexad = {'r':'','g':'','b':'','a':''};
+
         for (let k in this.colors) {
-            let con = this.utils.convert(this.colors[k])
             
-            // console.log(`${k} : ${con}`)
+            const a = this.colors[k]
             
-            hexad[k] = con
+            hexad[k] = this.utils.toHex(
+                k === 'a' ?
+                parseFloat(a) * 255 :
+                a
+            )
         };
 
-        if(this.colors['a'] != 1.0 || this.colors['a'] != 1) {
-            let a = this.colors['a'];
-            hexad['a'] = Math.round(parseFloat(a).toFixed(2) * 255).toString(16).substring(0,2);
-        } else {
+        if (hexad.a.toLowerCase() == 'ff') {
             delete hexad.a
         }
 
-        hexad = Object.values(hexad)
-        this.hex = `#${hexad.join('')}`
+        this.hex = `#${Object.values(hexad).join('')}`
     }
 
-    adaptrgba2hex(data) {
-        data._this.rgba2hex()
+    /**
+     * 
+     * @param { Picker.types } param0 
+     */
+    adaptrgba2hex({ _this }) {
+        _this.rgba2hex()
     }
 
-    setValues({type, _this, data}) {
+    /**
+     * 
+     * @param { Picker.types } param0 
+     */
+    setValues({ type, data }) {
         // console.log(type, _this, data)
         if (type == 'setValue') {
-            _this.$(`.${data[0]}`).forEach(i => i.value = data[1]);
+            $(`.${data[0]}`).forEach(i => i.value = data[1]);
         }
     }
 
-    setEx(data) {
-        let p = document.querySelector('#hex'),
-        _this = data._this
+    /**
+     * 
+     * @param { Picker.types } param0 
+     */
+    setEx({ _this }) {
+
+        /**
+         * @type { HTMLParagraphElement }
+         */
+        let p = $('#hex')
         p.innerText = _this.hex;
 
-        let {r,g,b,a} = _this.colors
-        _this.utils.setBg(document.querySelector('.pr'),r,g,b,a)
+        _this.utils.setBg($('body', true), _this.colors)
     }
 
     init() {
@@ -132,13 +163,14 @@ class Picker extends Observer {
         this.subscribe(this.setEx)
 
         this.addEvent([
-            {'class': 'red', 'var': 'r'},
-            {'class': 'green', 'var': 'g'},
-            {'class': 'blue', 'var': 'b'},
-            {'class': 'alpha', 'var': 'a'}
+            ['red', 'r'],
+            ['green', 'g'],
+            ['blue', 'b'],
+            ['alpha', 'a']
         ])
     }
 }
 
 const p = new Picker()
+debug = !debug
 p.init()

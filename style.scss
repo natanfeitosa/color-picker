@@ -1,0 +1,156 @@
+@import './utils.scss';
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body {
+    width: 100%;
+}
+
+body {
+    background-color: rgb(30, 40, 50);
+    min-height: 100vh;
+    /* width: 100vw; */
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px;
+    width: 100%;
+}
+
+input[type="range"] {
+    flex-basis: 60%;
+    -webkit-appearance: none;
+       -moz-appearance: none;
+            appearance: none;
+
+    &::-webkit-slider-thumb {
+        -webkit-appearance: none;
+                appearance: none;
+        margin-top: -6px;
+        border: none;
+        border: 2px solid #fafafa;
+        height: 20px;
+        width: 20px;
+        border-radius: 50%;    
+    }
+
+    &::-webkit-slider-runnable-track {
+        height: 6px;
+        border: none;
+        border-radius: 3px;
+    }
+
+    &:focus {
+        outline: none;
+    }
+}
+
+@include slider-range('red', rgb(255, 0, 0));
+@include slider-range('green', rgb(10, 150, 10));
+@include slider-range('blue', rgb(0, 0, 255));
+@include slider-range('alpha', rgb(0, 0, 0));
+
+// input[type="range"].red {
+
+//     &::-webkit-slider-runnable-track,
+//     &::-moz-range-track,
+//     &::-webkit-slider-thumb,
+//     &::-moz-range-thumb {
+//         background-color:red;
+//     }
+// }
+
+.card {
+    background-color: aliceblue;
+    border: 1px solid rgba(0, 0, 0, 0.125);
+    border-radius: .25rem;
+    display: inherit;
+    flex-direction: column;
+    margin: 10px auto;
+    padding: 10px;
+    width: min(92%, 540px);
+    max-width: 540px;
+}
+
+.header {
+    text-align: center;
+    justify-content: center;
+    flex-basis: 100%;
+    padding-bottom: 20px;
+    margin-bottom: 30px;
+}
+
+#title {
+    font-family: 'Ranchers', cursive;
+    font-size: 2.4rem;
+}
+
+.card-body {
+    display: inherit;
+    flex-direction: inherit;
+    width: 100%;
+}
+
+.box {
+    width: 58px;
+    font-weight: bold;
+    border: 1px solid rgba(0, 0, 0, 0.125);
+    border-radius: .25rem;
+    padding: 6px;
+}
+
+#pr {
+    background-color: white;
+    border: 1.1px solid rgba(0, 0, 0, 0.13);
+    border-radius: .25rem;
+    height: 20px;
+    width: 300px;
+    display: inherit;
+    justify-content: center;
+    font-weight: 600;
+}
+
+@media (max-width: 576px) {
+    .card {
+        padding: 10px 2px;
+        /*width: 90%;*/
+    }
+
+    #pr {
+        width: 80%;
+    }
+}
+
+@media (max-width: 425px) {
+    div {
+        padding: 6px 2px;
+    }
+
+    #title {
+        font-size: 2rem;
+    }
+
+    .box {
+        padding: 6px 2px;
+        width: 52px;
+
+        &.red,
+        &.green,
+        &.blue,
+        &.alpha {
+            width: 44px;
+        }
+    }
+}

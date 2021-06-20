@@ -1,5 +1,7 @@
 "use strict";
 
+var _this2 = void 0;
+
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
@@ -18,21 +20,14 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-/*function altera(el) {
-    let r = document.querySelectorAll('input[name=r]')[0].value,
-        g = document.querySelectorAll('input[name=g]')[0].value,
-        b = document.querySelectorAll('input[name=b]')[0].value,
-        a = document.querySelectorAll('input[name=a]')[0].value
-    let v = el.value, n = el.name;
-    let rgba = `rgba(${r}, ${g}, ${b}, ${a})`
-    let hex = rgbaToHex(rgba)
-    console.log(rgba)
-    n == 'a' ? $('#' + n).value = parseFloat(v) : $('#' + n).value = parseInt(v)
-    bg($('.pr'), r, g, b, a)
-    let p = $('#hex')
-    p.innerText = `${hex}`
-    hex == '#000000ff' ? p.style.color = '#fff' : p.style.color = '#000'
-}*/
+var debug = true;
+
+if (!String.prototype.trim) {
+  String.prototype.trim = function () {
+    return _this2.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
+  };
+}
+
 var Observer =
 /*#__PURE__*/
 function () {
@@ -78,18 +73,17 @@ function () {
   }
 
   _createClass(Utils, [{
-    key: "trim",
-    value: function trim(str) {
-      return toString(str).replace(/^\s+|\s+$/gm, '');
-    }
-  }, {
-    key: "convert",
-    value: function convert(c) {
+    key: "toHex",
+    value: function toHex(c) {
       return parseInt(c, 10).toString(16);
     }
   }, {
     key: "setBg",
-    value: function setBg(e, r, g, b, a) {
+    value: function setBg(e, _ref) {
+      var r = _ref.r,
+          g = _ref.g,
+          b = _ref.b,
+          a = _ref.a;
       var rgba = "rgba(".concat(r, ", ").concat(g, ", ").concat(b, ", ").concat(a || 1, ")");
       e.style.background = rgba;
       console.log(rgba);
@@ -98,6 +92,23 @@ function () {
 
   return Utils;
 }();
+/**
+ * 
+ * @param { string } str 
+ * @param { boolean } unique 
+ * @returns { Element | NodeListOf.<Element> }
+ */
+
+
+var $ = function $(str) {
+  var unique = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+  if (/^\#/.test(str.trim()) || unique) {
+    return document.querySelector(str);
+  }
+
+  return document.querySelectorAll(str);
+};
 
 var Picker =
 /*#__PURE__*/
@@ -105,41 +116,53 @@ function (_Observer) {
   _inherits(Picker, _Observer);
 
   function Picker() {
-    var _this2;
+    var _this3;
 
     _classCallCheck(this, Picker);
 
-    _this2 = _possibleConstructorReturn(this, _getPrototypeOf(Picker).call(this)); // this.observer = new Observer();
+    _this3 = _possibleConstructorReturn(this, _getPrototypeOf(Picker).call(this)); // this.observer = new Observer();
 
-    _this2.utils = new Utils();
-    _this2.colors = {
-      'r': 255,
-      'g': 255,
-      'b': 255,
+    _this3.utils = new Utils();
+    _this3.colors = {
+      'r': 30,
+      'g': 40,
+      'b': 50,
       'a': 1
     };
-    _this2.hex = '#ffffff';
-    _this2.$ = document.querySelectorAll.bind(document);
-    return _this2;
+    _this3.hex = '#ffffff';
+    _this3.ranges = [];
+    return _this3;
   }
+  /**
+   * 
+   * @param { Array.<Array.<String>> } opts
+   * @returns { void }
+   */
+
 
   _createClass(Picker, [{
     key: "addEvent",
-    value: function addEvent(el) {
-      var _this3 = this;
+    value: function addEvent(opts) {
+      var _this4 = this;
 
       var _this = this;
 
-      el.map(function (i) {
-        _this3.$(".".concat(i['class'])).forEach(function (item) {
-          item.addEventListener('input', function (e) {
-            var color = i["var"] === 'a' ? parseFloat(item.value) : parseInt(item.value);
-            _this3.colors[i['var']] = color; // console.log(`\nEvent: ${color}`)
+      opts.map(function (i) {
+        $(".".concat(i[0])).forEach(function (el) {
+          el.addEventListener('input', function () {
+            var color = i[1] == 'a' ? parseFloat(el.value) : parseInt(el.value);
+            _this4.colors[i[1]] = color;
 
-            _this3.notify({
+            if (debug) {
+              console.log("Array Item: ".concat(i));
+              console.log("Color num: ".concat(color));
+              console.log("Color code: ".concat(i[1]));
+            }
+
+            _this4.notify({
               'type': 'setValue',
               _this: _this,
-              'data': [i['class'], color]
+              'data': [i[0], color]
             });
           });
         });
@@ -156,55 +179,46 @@ function (_Observer) {
       };
 
       for (var k in this.colors) {
-        var con = this.utils.convert(this.colors[k]); // console.log(`${k} : ${con}`)
-
-        hexad[k] = con;
+        var a = this.colors[k];
+        hexad[k] = this.utils.toHex(k === 'a' ? parseFloat(a) * 255 : a);
       }
 
       ;
 
-      if (this.colors['a'] != 1.0 || this.colors['a'] != 1) {
-        var a = this.colors['a'];
-        hexad['a'] = Math.round(parseFloat(a).toFixed(2) * 255).toString(16).substring(0, 2);
-      } else {
+      if (hexad.a.toLowerCase() == 'ff') {
         delete hexad.a;
       }
 
-      hexad = Object.values(hexad);
-      this.hex = "#".concat(hexad.join(''));
+      this.hex = "#".concat(Object.values(hexad).join(''));
     }
   }, {
     key: "adaptrgba2hex",
-    value: function adaptrgba2hex(data) {
-      data._this.rgba2hex();
+    value: function adaptrgba2hex(_ref2) {
+      var _this = _ref2._this;
+
+      _this.rgba2hex();
     }
   }, {
     key: "setValues",
-    value: function setValues(_ref) {
-      var type = _ref.type,
-          _this = _ref._this,
-          data = _ref.data;
+    value: function setValues(_ref3) {
+      var type = _ref3.type,
+          data = _ref3.data;
 
       // console.log(type, _this, data)
       if (type == 'setValue') {
-        _this.$(".".concat(data[0])).forEach(function (i) {
+        $(".".concat(data[0])).forEach(function (i) {
           return i.value = data[1];
         });
       }
     }
   }, {
     key: "setEx",
-    value: function setEx(data) {
-      var p = document.querySelector('#hex'),
-          _this = data._this;
+    value: function setEx(_ref4) {
+      var _this = _ref4._this;
+      var p = $('#hex');
       p.innerText = _this.hex;
-      var _this$colors = _this.colors,
-          r = _this$colors.r,
-          g = _this$colors.g,
-          b = _this$colors.b,
-          a = _this$colors.a;
 
-      _this.utils.setBg(document.querySelector('.pr'), r, g, b, a);
+      _this.utils.setBg($('body', true), _this.colors);
     }
   }, {
     key: "init",
@@ -212,19 +226,7 @@ function (_Observer) {
       this.subscribe(this.adaptrgba2hex);
       this.subscribe(this.setValues);
       this.subscribe(this.setEx);
-      this.addEvent([{
-        'class': 'red',
-        'var': 'r'
-      }, {
-        'class': 'green',
-        'var': 'g'
-      }, {
-        'class': 'blue',
-        'var': 'b'
-      }, {
-        'class': 'alpha',
-        'var': 'a'
-      }]);
+      this.addEvent([['red', 'r'], ['green', 'g'], ['blue', 'b'], ['alpha', 'a']]);
     }
   }]);
 
@@ -232,4 +234,5 @@ function (_Observer) {
 }(Observer);
 
 var p = new Picker();
+debug = !debug;
 p.init();
